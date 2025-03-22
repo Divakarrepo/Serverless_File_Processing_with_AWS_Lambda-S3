@@ -1,0 +1,32 @@
+import boto3
+import json
+
+s3 = boto3.client('s3')
+
+def lambda_handler(event, context):
+    # Extract bucket and file details from event
+    source_bucket = event['Records'][0]['s3']['bucket']['name']
+    object_key = event['Records'][0]['s3']['object']['key']
+    
+    destination_bucket = "file-processed-output" # change your destination bucket name
+    processed_key = f"processed-{object_key}"
+
+    # Download file from S3
+    response = s3.get_object(Bucket=source_bucket, Key=object_key)
+    file_content = response['Body'].read().decode('utf-8')
+
+    # Process the file (convert text to uppercase)
+    processed_content = file_content.upper()
+
+    # Upload processed file to destination S3 bucket
+    s3.put_object(
+        Bucket=destination_bucket,
+        Key=processed_key,
+        Body=processed_content,
+        ContentType='text/plain'
+    )
+
+    return {
+        'statusCode': 200,
+        'body': json.dumps(f'File processed and saved to {destination_bucket}/{processed_key}')
+    }
