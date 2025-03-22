@@ -1,4 +1,4 @@
-
+![serverless](serverlessfileprocessing.png)
 
 # Serverless File Processing with AWS Lambda & S3
 
